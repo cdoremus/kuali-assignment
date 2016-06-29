@@ -38,4 +38,10 @@ public class ElevatorRequestService {
 		// TODO: if car is still null at this point, an exception should be thrown
 		return car;		
 	}		
+
+	public void updateElevator(ElevatorCar elevator) {
+		
+		//persist elevator
+		carRepository.update(elevator);
+	}
 }
