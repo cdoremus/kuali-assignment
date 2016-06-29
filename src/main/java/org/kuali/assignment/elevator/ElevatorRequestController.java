@@ -1,21 +1,21 @@
 package org.kuali.assignment.elevator;
 
 public class ElevatorRequestController implements ElevatorNotificationListener {
-	private ElevatorMovementController elevatorMovementController;
+	private ElevatorMovementService elevatorMovementService;
 	private ElevatorRequestService elevatorRequestService;
 	private ElevatorMaintenanceService  elevatorMaintenanceService;
 	
 	public ElevatorRequestController() {
 		//TODO: Use DI to inject these
-		this.elevatorMovementController = new ElevatorMovementController();
+		this.elevatorMovementService = new ElevatorMovementService(this);
 		this.elevatorRequestService = new ElevatorRequestService();
 		this.elevatorMaintenanceService = new ElevatorMaintenanceService();
 	}
 	
 	//Use this for manual DI in tests
-	ElevatorRequestController(ElevatorMovementController elevatorMovementController, 
+	ElevatorRequestController(ElevatorMovementService elevatorMovementController, 
 			ElevatorRequestService elevatorRequestService, ElevatorMaintenanceService  elevatorMaintenanceService) {
-		this.elevatorMovementController = elevatorMovementController;
+		this.elevatorMovementService = elevatorMovementController;
 		this.elevatorRequestService = elevatorRequestService;
 		this.elevatorMaintenanceService = elevatorMaintenanceService;
 	}
@@ -27,9 +27,6 @@ public class ElevatorRequestController implements ElevatorNotificationListener {
 	 * @return the id of the travelled car
 	 */
 	public int call(ElevatorCallState callState) {
-		
-		//TODO: Validate callState to make sure we aren't going to a bogus floor
-		
 		
 		//car selected
 		ElevatorCar selectedCar = null;
