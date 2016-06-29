@@ -1,0 +1,17 @@
+/*
+ * Gradle build for kuali-assigment project
+ * 
+ * 
+ */
+
+apply plugin: 'java'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+	
+    testCompile 'junit:junit:4.12'
+}
+
