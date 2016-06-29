@@ -1,6 +1,9 @@
 /*
  * Gradle build for kuali-assigment project
  * 
+ * The following comand will build the project and run a single unit test that is a basic elevator simulation:
+ * 
+ * ./gradlew -Dtest.single=ElevatorRequestControllerTest test
  * 
  */
 
