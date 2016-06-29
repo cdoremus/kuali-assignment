@@ -16,5 +16,11 @@ public class ElevatorCallState {
 	public int getRequestedFloor() {
 		return requestedFloor;
 	}
+
+	public MovementDirection getMovementDirection() {
+		return (startFloor < requestedFloor ? MovementDirection.UP :
+			startFloor > requestedFloor ? MovementDirection.DOWN : 
+			MovementDirection.NOT_MOVING);
+	}
 	
 }
