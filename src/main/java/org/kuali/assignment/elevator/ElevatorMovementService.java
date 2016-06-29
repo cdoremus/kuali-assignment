@@ -7,8 +7,30 @@ public class ElevatorMovementService {
 		this.elevatorNotificationListener = elevatorNotificationListener;
 	}
 
-	public void move(ElevatorCallState callState) {
+	public void moveToDestination(ElevatorCar elevator) {
+		//elevator arrives at start floor and door opens
+		elevatorNotificationListener.doorOpens(elevator);
+		//Door closes at start floor
+		elevatorNotificationListener.doorCloses(elevator);
+		int currentFloor = elevator.getCurrentFloor();
+		int destinationFloor = elevator.getRequestedFloor();
+		int difference = Math.abs(currentFloor - destinationFloor);
+		//elevator moves through the floors toward its destination
+		while(difference != 0) {
+			singleMove(elevator);
+			difference--;
+		}
+		//elevator arrives and door opens
+		elevatorNotificationListener.doorOpens(elevator);
 		
+		//Passenger(s), exit the elevator and new passenger(s) enter the elevator
+		
+		//Door closes
+		elevatorNotificationListener.doorCloses(elevator);
+		
+		//increment totalTrips
+		int totalTrips = elevator.getTotalTrips();
+		elevator.setTotalTrips(++totalTrips);
 	}
 
 	public ElevatorCar singleMove(ElevatorCar elevator) {
