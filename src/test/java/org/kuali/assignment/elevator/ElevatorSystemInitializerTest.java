@@ -24,6 +24,7 @@ public class ElevatorSystemInitializerTest {
 
 	@Before
 	public void setUp() throws Exception {
+		ElevatorCarIdRepository.INSTANCE.reset();
 		initializer = new ElevatorSystemInitializer();
 		config = ElevatorSystemConfigImpl.INSTANCE;
 	}

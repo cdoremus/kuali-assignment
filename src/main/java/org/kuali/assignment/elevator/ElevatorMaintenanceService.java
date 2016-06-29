@@ -1,5 +1,6 @@
 package org.kuali.assignment.elevator;
 
+//FIXME: THis needs to be implemented to encapsulate maintenance functions
 public class ElevatorMaintenanceService {
 
 	ElevatorSystemConfig config;
