@@ -42,4 +42,63 @@ public class ElevatorCarRepositoryMemoryImplTest {
 		assertSame(found, newCar);
 	}
 	
+	@Test
+	public void testElevatorCarMovingDownAndPassingStartFloor_PassingStart() {
+		
+		ElevatorCar elevatorCar = new ElevatorCar();
+		elevatorCar.setCurrentFloor(7);
+		elevatorCar.setRequestedFloor(4);
+		elevatorCar.setOccupied(true);
+		elevatorCar.setMovementDirection(MovementDirection.DOWN);
+		
+		boolean ok = repository.elevatorCarPassingStartFloor(elevatorCar, new ElevatorCallState(5, 3));
+		
+		assertTrue(ok);
+		
+	}
+
+	@Test
+	public void testElevatorCarMovingDownAndPassingStartFloor_NotPassingStart() {
+		
+		ElevatorCar elevatorCar = new ElevatorCar();
+		elevatorCar.setCurrentFloor(7);
+		elevatorCar.setRequestedFloor(6);
+		elevatorCar.setOccupied(true);
+		elevatorCar.setMovementDirection(MovementDirection.DOWN);
+		
+		boolean ok = repository.elevatorCarPassingStartFloor(elevatorCar, new ElevatorCallState(5, 3));
+		
+		assertFalse(ok);
+		
+	}
+
+	@Test
+	public void testElevatorCarMovingUpAndPassingStartFloor_PassingStart() {
+		
+		ElevatorCar elevatorCar = new ElevatorCar();
+		elevatorCar.setCurrentFloor(4);
+		elevatorCar.setRequestedFloor(7);
+		elevatorCar.setOccupied(true);
+		elevatorCar.setMovementDirection(MovementDirection.UP);
+		
+		boolean ok = repository.elevatorCarPassingStartFloor(elevatorCar, new ElevatorCallState(5, 3));
+		
+		assertTrue(ok);
+		
+	}
+
+	@Test
+	public void testElevatorCarMovingUpAndPassingStartFloor_NotPassingStart() {
+		
+		ElevatorCar elevatorCar = new ElevatorCar();
+		elevatorCar.setCurrentFloor(6);
+		elevatorCar.setRequestedFloor(7);
+		elevatorCar.setOccupied(true);
+		elevatorCar.setMovementDirection(MovementDirection.UP);
+		
+		boolean ok = repository.elevatorCarPassingStartFloor(elevatorCar, new ElevatorCallState(5, 3));
+		
+		assertFalse(ok);
+		
+	}
 }
