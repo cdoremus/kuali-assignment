@@ -24,7 +24,7 @@ public class ElevatorRequestController implements ElevatorNotificationListener {
 	 * Fulfill an single elevator request and travel to the destination floor
 	 * 
 	 * @param callState contains the start and destination floors
-	 * @return the id of the travelled car
+	 * @return the id of the traveled car
 	 */
 	public int call(ElevatorCallState callState) {
 		
@@ -36,11 +36,25 @@ public class ElevatorRequestController implements ElevatorNotificationListener {
 			selectedCar.setRequestedFloor(callState.getRequestedFloor());
 			selectedCar.setMovementDirection(callState.getMovementDirection());
 			
+			//car moves 
+			elevatorMovementService.moveToDestination(selectedCar);
+			
+			selectedCar.setOccupied(true);
+			
+			selectedCar.setMovementDirection(MovementDirection.NOT_MOVING);
+			
+			//maintenance mode check is made to see if car needs to be put out-of-service	
+			elevatorMaintenanceService.maintenanceCheck(selectedCar);
+			
+			//data store updated with new elevator state
+			elevatorRequestService.updateElevator(selectedCar);
+
 		} catch (ElevatorValidationException e) {
-			// TODO Auto-generated catch block
+			//TODO: Proper logging
 			System.err.println(String.format("Validation problem: %s", e.getMessage()));
 			e.printStackTrace();
 		} catch (RuntimeException e) {
+			//TODO: Proper logging
 			System.err.println(String.format("Runtime exception: %s", e.getMessage()));
 			
 			e.printStackTrace();
