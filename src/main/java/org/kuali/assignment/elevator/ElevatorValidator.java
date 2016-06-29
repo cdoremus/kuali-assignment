@@ -10,6 +10,11 @@ public class ElevatorValidator {
 	
 	
 	public boolean validateFloorSelection(ElevatorCallState callState) {
-			return false;
+		if (callState.getStartFloor() < config.getBottomFloor() || 
+				callState.getRequestedFloor() > config.getTopFloor()) {
+			return false; 
+		} else {
+			return true;
+		}
 	}
 }
