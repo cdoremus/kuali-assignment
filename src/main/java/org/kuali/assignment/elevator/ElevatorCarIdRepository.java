@@ -16,4 +16,7 @@ public enum ElevatorCarIdRepository {
 		return idGenerator.incrementAndGet();
 	}
 
+	public void reset() {
+		idGenerator.set(0);
+	}
 }
