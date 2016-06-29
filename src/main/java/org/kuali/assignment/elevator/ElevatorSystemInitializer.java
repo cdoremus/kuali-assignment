@@ -8,6 +8,7 @@ public class ElevatorSystemInitializer {
 	public ElevatorSystemInitializer() {
 		// A DI framework like Spring or Guice should be used 
 		config = ElevatorSystemConfigImpl.INSTANCE;
+		carRepository = ElevatorCarRepositoryMemoryImpl.INSTANCE;
 	}
 
 	public void init() {
