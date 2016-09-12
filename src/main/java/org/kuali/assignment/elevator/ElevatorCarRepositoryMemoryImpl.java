@@ -1,8 +1,8 @@
 package org.kuali.assignment.elevator;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 // This is an in-memory database instance, implemented as an enum.
 //	An actual SQL or no-SQL database would be used in a distributed environment.
@@ -11,13 +11,16 @@ public enum ElevatorCarRepositoryMemoryImpl implements ElevatorCarRepository {
 	INSTANCE;
 	
 	// key is ElevatorCar id
-	Map<Integer,ElevatorCar> elevatorCarMap = new ConcurrentHashMap<>();
+	ConcurrentMap<Integer,ElevatorCar> elevatorCarMap = new ConcurrentHashMap<>();
 	private ElevatorSystemConfig config = ElevatorSystemConfigImpl.INSTANCE;
 	
 	
 	public ElevatorCar create(ElevatorCar elevator) {
+		if (elevator == null) {
+			throw new ElevatorPersistenceException("ElevtorCar object cannot be null");
+		}
 		elevator.setId(ElevatorCarIdRepository.INSTANCE.getNextId());
-		elevatorCarMap.put(elevator.getId(), elevator);
+		elevatorCarMap.putIfAbsent(elevator.getId(), elevator);
 //		System.out.println(String.format("Elevator created with id=%d", elevator.getId()));
 		return elevator;
 	}
@@ -32,7 +35,7 @@ public enum ElevatorCarRepositoryMemoryImpl implements ElevatorCarRepository {
 
 	@Override
 	public void update(ElevatorCar elevator) {
-		elevatorCarMap.put(elevator.getId(), elevator);
+		elevatorCarMap.replace(elevator.getId(), elevator);
 	}
 	
 	@Override //1st priority

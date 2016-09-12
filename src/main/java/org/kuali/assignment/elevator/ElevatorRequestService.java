@@ -23,19 +23,23 @@ public class ElevatorRequestService {
 		if (!elevatorValidator.validateFloorSelection(callState)) {
 			throw new ElevatorValidationException(String.format("Starting floor or requested floor is not valid (start floor=%d, requested floor=%d", callState.getStartFloor(), callState.getRequestedFloor()));
 		}
-		
-		//1st priority
-		car = carRepository.findUnoccupiedElevatorAtFloor(callState);
-		//2nd priority
-		if (car == null) {
-			car = carRepository.movingOccupiedElevatorPassingCurrentFloor(callState);
+		synchronized (this) {			
+			//1st priority
+			car = carRepository.findUnoccupiedElevatorAtFloor(callState);
+			//2nd priority
+			if (car == null) {
+				car = carRepository.movingOccupiedElevatorPassingCurrentFloor(callState);
+			}
+			//3rd priority
+			if (car == null) {
+				car = carRepository.closestUnoccupiedElevator(callState);
+			}
 		}
-		//3rd priority
-		if (car == null) {
-			car = carRepository.closestUnoccupiedElevator(callState);
-		}
 		
-		// TODO: if car is still null at this point, an exception should be thrown
+		// If car is still null at this point, an exception should be thrown
+		if (car == null) {
+			throw new IllegalStateException(String.format("An elevator car has not been found using the call state: %s", callState.toString()));
+		}
 		return car;		
 	}		
 
