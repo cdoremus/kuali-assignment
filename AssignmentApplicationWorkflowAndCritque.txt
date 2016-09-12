@@ -1,0 +1,140 @@
+Kuali Assignment (Programming Challenge) Workflow and Critique
+
+----------------------------------------------------------------------
+Preface
+----------------------------------------------------------------------
+I spent a considerable about of time beyond the allotted two hours to design the
+application and to validate the design with a working prototype.
+
+I wanted to make sure that my design would work.
+
+----------------------------------------------------------------------
+Application Workflow
+----------------------------------------------------------------------
+/** 
+ * This section is setup with indendations representing the caller/callee relationship
+ */
+// console UI run by a unit test
+ElevatorUI.main() ->
+
+	/** populate elevator with pre-configured data */
+	ElevatorSystemInitializer.init() ->
+
+		ElevatorSystemConfig.getNumberOfElevators(): int
+		-- Implementation: ElevatorSystemConfigImpl
+
+	/** Elevator car called with a start and end floor
+	*** Assumes all passengers entering an elevator at a floor have the same destination */
+	ElevatorUI.callElevator(startFloor: int, endFloor: int) ->
+		- encapsulates the pressing the call button outside the elevator
+		and the floor button once inside the elevator
+
+	ElevatorRequestController.call(ElevatorCallState callState) ->
+
+		ElevatorRequestService.selectElevatorCar(callState): ElevatorCar ->
+
+			ElevatorValidator.validateFloorSelection(callState): boolean
+				throw ElevatorValidationException() [if invalid]
+		
+			** Elevator car selection rules called in priority order	
+			ElevatorCarRepository.findUnoccupiedElevatorAtFloor(callState): ElevatorCar
+			ElevatorCarRepository.movingOccupiedElevatorPassingCurrentFloor(callState): ElevatorCar
+			ElevatorCarRepository.closestUnoccupiedElevator(callState): ElevatorCar
+
+		ElevatorMovementService.moveToDestination(ElevatorCar: selectedCar)
+		-- invokes callbacks to ElevatorRequestController ElevatiorNotificationListener methods
+
+		ElevatorMaintenanceService.maintenanceCheck(selectedCar)
+
+/** end of workflow */
+----------------------------------------------------------------------
+Configurations
+----------------------------------------------------------------------
+ElevatorSystemConfig (ElevatorSystemConfigImpl)
+-- number of elevators
+-- total number of floors
+-- trip maintenance threshold
+
+----------------------------------------------------------------------
+Elevator 'events' needing reporting
+----------------------------------------------------------------------
+ElevatorNotificationListener interface
+-- implemented by ElevatorRequestController
+
+----------------------------------------------------------------------
+Data Stores
+----------------------------------------------------------------------
+ElevatorCarRepository
+- implementation:
+	ElevatorCarRepositoryMemoryImpl
+	-- singleton, implemented as an enum
+- contains elevator car call rules methods
+*** should be moved to another class (see below)
+
+ElevatorCarIdRepository
+-- singleton repository for getting elevator car id's
+
+----------------------------------------------------------------------
+Domain/Business objects:	
+----------------------------------------------------------------------
+ElevatorCar
+-- State data
+	- id
+	- requestedFloor
+	- movementDirection
+	- isOccupied
+	- isInService
+	- totalFloorCount
+-- MaintenanceData
+	- totalFloorCount
+	- totalTrips
+	- isInService
+
+ElevatorCallState
+- startFloor
+- requestFloor
+
+-------------------------------------------------------------------------------------
+Changes to Make Next:
+-------------------------------------------------------------------------------------
+* Scale the design to allow a car to be called to a floor by passengers travelling to different floors
+-- My current design only handles where all passengers entering an car are travelling to the same floor
+1. Add a List of destinations to the ElevatorCar object
+2. Change the UI to allow all passengers entering at a floor to select a destination
+3. Add a destination to the List when the elevator arrives to pick up a passenger
+4. Remove the destination from the List after the elevator arrives at the destination floor
+5. Adjust the requested floor (ElevatorCar.requestedFloor) to the floor with the greatest distance to travel,
+which depends on passenger selection
+
+* Use polymorphism to abstract elevator car selection rules into separate implementations:
+interface ElevatorSelectionRule
++ selectElevator(callState: ElevatorCallState): ElevatorCar
+	* Move car-selection business rules out of ElevatorCarRepository
+	* Create a ElevatorCarSelectionRuleManager containing: List<ElevatorSelectionRule>
+		- list would be populated in priority order
+		- selectCar(): ElevatorCar method would iterate through the list to select the appropriate elevator car
+* Add unit and integration tests
+	- emphasize logic-rich methods
+
+* Add dependency injection for loose coupling
+
+* Decouple the maintenance task from the rest of the workflow by dumping notifications into a message queue or database and have the Maintenance Service monitor it.
+	* Refactor maintenance data out of ElevatorCar into new domain class 
+
+* Make ElevatorCar an immutable object (with final fields and an internal builder)
+	- makes it thread safe
+
+* Use a real data store (ElevatorCarRepository)
+	- MongoDB or a SQL database
+
+* Add a UI representation of the elevator system
+	- The UI would contain a grid with:
+		1. Columns representing each elevator shaft
+		2. Rows representing each floors 
+		3. Grid cells would contain the elevator cars (one cell in each column would represent the car's current position).
+	- Call buttons will be placed at the start of each row. They would allow the selection of the
+	desired floor by an elevator passenger. Multiple floor selections would be allowed.
+
+-------------------------------------------------------------------------------------
+
+
