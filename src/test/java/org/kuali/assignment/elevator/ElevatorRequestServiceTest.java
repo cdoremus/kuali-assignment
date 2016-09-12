@@ -1,12 +1,13 @@
 package org.kuali.assignment.elevator;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class ElevatorRequestServiceTest {
 
@@ -83,6 +84,11 @@ public class ElevatorRequestServiceTest {
 		ElevatorCar car = requestService.selectElevatorCar(new ElevatorCallState(4, 6)); 
 		
 		assertEquals(car3, car);
+	}
+	
+	@Test
+	public void testSelectElevatorCar_ThrowsIllegalStateException() throws Exception {
+		ElevatorCarRepository repository = Mockito.mock(ElevatorCarRepository.class);
 	}
 	
 	@Test
